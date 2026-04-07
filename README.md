@@ -59,7 +59,6 @@ Inference Engine (LLM)
 OpenEnv Environment
         ↓
 Grading System
-
 ---
 
 ## ⚙️ Technical Breakdown
