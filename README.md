@@ -1,3 +1,12 @@
+---
+title: CodeReview AI
+emoji: 🤖
+colorFrom: blue
+colorTo: purple
+sdk: docker
+app_port: 7860
+---
+
 # 🚀 CodeReview AI — OpenEnv RL Environment
 
 ### 🧠 Meta AI Hackathon Project
