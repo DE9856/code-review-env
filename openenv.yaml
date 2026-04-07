@@ -1,0 +1,47 @@
+name: code-review-env
+version: 1.0.0
+description: OpenEnv environment for automated code review using LLMs with reward-based evaluation
+
+environment:
+  class: CodeReviewEnvironment
+  module: environment
+  max_steps: 10
+
+entrypoints:
+  reset: reset
+  step: step
+  state: state
+
+action_space:
+  name: CodeReviewAction
+  module: models
+  description: Agent submits a review or skips the task
+
+observation_space:
+  name: CodeReviewObservation
+  module: models
+  description: Contains code diff, file metadata, and task info
+
+tasks:
+  easy:
+    count: 1
+    description: Syntax errors and simple bugs
+  medium:
+    count: 1
+    description: Logical errors and edge cases
+  hard:
+    count: 2
+    description: Performance inefficiencies and optimization problems
+
+graders:
+  easy: graders.easy.grade_easy
+  medium: graders.medium.grade_medium
+  hard: graders.hard.grade_hard
+
+metadata:
+  author: Meta AI Hackathon Team
+  tags:
+    - reinforcement-learning
+    - code-review
+    - llm-agents
+    - openenv

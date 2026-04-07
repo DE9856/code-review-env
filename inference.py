@@ -6,7 +6,7 @@ from openai import OpenAI
 
 # ENV CONFIG
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/hf-inference/models")
-API_KEY = os.getenv("HF_TOKEN") or os.getenv("OPENAI_API_KEY", "")
+API_KEY = os.getenv("OPENAI_API_KEY", "")
 MODEL_NAME = os.getenv("MODEL_NAME", "mistralai/Mistral-7B-Instruct-v0.3")
 TEMPERATURE = 0.7
 MAX_TOKENS = 500
