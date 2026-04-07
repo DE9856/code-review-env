@@ -1,0 +1,12 @@
+[
+  {
+    "id": "medium_1",
+    "difficulty": "medium",
+    "source": "synthetic",
+    "file_name": "find_max.py",
+    "language": "python",
+    "diff": "def find_max(lst): max_val = 0\n for num in lst:\n  if num > max_val:\n   max_val = num\n return max_val",
+    "expected_keywords": ["negative numbers", "initialization", "first element", "logical error"],
+    "description": "Identify and fix any logical issues in the function"
+  }
+]

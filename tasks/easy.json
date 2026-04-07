@@ -1,0 +1,12 @@
+[
+  {
+    "id": "easy_1",
+    "difficulty": "easy",
+    "source": "synthetic",
+    "file_name": "even_check.py",
+    "language": "python",
+    "diff": "def is_even(n): return n % 2 = 0",
+    "expected_keywords": ["==", "comparison", "assignment", "syntax error"],
+    "description": "Identify and fix the bug in the function"
+  }
+]

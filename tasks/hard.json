@@ -1,0 +1,29 @@
+[
+  {
+    "id": "hard_1",
+    "difficulty": "hard",
+    "source": "synthetic",
+    "file_name": "duplicates.py",
+    "language": "python",
+    "diff": "def has_duplicates(arr):\n for i in range(len(arr)):\n  for j in range(i+1, len(arr)):\n   if arr[i] == arr[j]:\n    return True\n return False",
+    "expected_keywords": ["O(n^2)", "nested loops", "inefficient", "set", "optimize"],
+    "description": "Identify the inefficiency in the function and suggest an optimized solution"
+  },
+  {
+    "id": "hard_2",
+    "difficulty": "hard",
+    "source": "github",
+    "repo": "example/repo-utils",
+    "file_name": "repo_utils.py",
+    "language": "python",
+    "description": "Detect inefficiency and suggest optimization for duplicate checking function",
+    "diff": "def has_duplicates(items):\n    seen = []\n    for item in items:\n        if item in seen:\n            return True\n        seen.append(item)\n    return False",
+    "expected_keywords": [
+      "inefficient",
+      "O(n^2)",
+      "set",
+      "optimize",
+      "use hash"
+    ]
+  }
+]
