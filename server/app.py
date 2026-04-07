@@ -12,7 +12,7 @@ from environment import CodeReviewEnvironment
 from models import CodeReviewAction, CodeReviewObservation, CodeReviewState, ActionType
 from inference import run_inference
 
-MODEL_NAME = os.getenv("MODEL_NAME", "mistralai/Mistral-7B-Instruct-v0.3")
+MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen3-Coder-480B-A35B-Instruct")
 BENCHMARK  = os.getenv("BENCHMARK", "code-review")
 
 app = FastAPI(
