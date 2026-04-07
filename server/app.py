@@ -3,9 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
 import sys
 from pathlib import Path
-
-# Add parent directory to path
-sys.path.append(str(Path(__file__).parent.parent))
+import os
+sys.path.append(os.getcwd())
 
 from environment import CodeReviewEnvironment
 from models import CodeReviewAction, CodeReviewObservation, CodeReviewState

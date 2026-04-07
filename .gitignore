@@ -4,15 +4,15 @@ __pycache__/
 *.pyo
 *.pyd
 
-# Virtual environment
+# Virtual environments
 venv/
-.env
+.venv/
 
-# Environment files
+# Environment variables
 .env
 *.env
 
-# VS Code
+# IDE
 .vscode/
 
 # OS files
@@ -21,6 +21,16 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Databases / cache
+*.sqlite3
+*.db
+*.cache
+
+# Build files
+build/
+dist/
+*.egg-info/
 
 # YAML sensitive configs
 openenv.yaml
