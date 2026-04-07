@@ -51,13 +51,17 @@ This enables **trainable code-review agents**.
 ## 🏗️ System Architecture
 
 Frontend (UI Dashboard)
-        ↓
+        |
+        v
 FastAPI Backend
-        ↓
+        |
+        v
 Inference Engine (LLM)
-        ↓
+        |
+        v
 OpenEnv Environment
-        ↓
+        |
+        v
 Grading System
 ---
 
