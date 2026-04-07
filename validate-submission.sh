@@ -2,7 +2,7 @@
 #
 # validate-submission.sh — OpenEnv Submission Validator
 #
-# Checks that your HF Space is live, Docker image builds, and openenv validate passes.
+# Checks that your HF Space is live, Docker image builds, and /home/deepesh/.local/bin/openenv validate passes.
 #
 # Prerequisites:
 #   - Docker:       https://docs.docker.com/get-docker/
@@ -155,22 +155,22 @@ else
   stop_at "Step 2"
 fi
 
-log "${BOLD}Step 3/3: Running openenv validate${NC} ..."
+log "${BOLD}Step 3/3: Running /home/deepesh/.local/bin/openenv validate${NC} ..."
 
-if ! command -v openenv &>/dev/null; then
+if ! command -v /home/deepesh/.local/bin/openenv &>/dev/null; then
   fail "openenv command not found"
   hint "Install it: pip install openenv-core"
   stop_at "Step 3"
 fi
 
 VALIDATE_OK=false
-VALIDATE_OUTPUT=$(cd "$REPO_DIR" && openenv validate 2>&1) && VALIDATE_OK=true
+VALIDATE_OUTPUT=$(cd "$REPO_DIR" && /home/deepesh/.local/bin/openenv validate 2>&1) && VALIDATE_OK=true
 
 if [ "$VALIDATE_OK" = true ]; then
-  pass "openenv validate passed"
+  pass "/home/deepesh/.local/bin/openenv validate passed"
   [ -n "$VALIDATE_OUTPUT" ] && log "  $VALIDATE_OUTPUT"
 else
-  fail "openenv validate failed"
+  fail "/home/deepesh/.local/bin/openenv validate failed"
   printf "%s\n" "$VALIDATE_OUTPUT"
   stop_at "Step 3"
 fi
