@@ -36,15 +36,70 @@ This transforms code review into a **learning problem**.
 
 ---
 
-## 🧠 Core Idea
+## 🧠 Environment Design (OpenEnv)
 
-We combine:
+This project implements a fully **OpenEnv-compatible environment** for code review tasks.
 
-- LLMs (reasoning + generation)
-- OpenEnv (agent-environment interaction)
-- Custom reward functions (evaluation)
+### Observation Space
 
-➡️ Enabling **trainable code-review agents**
+Each observation contains:
+
+| Field | Description |
+|-------|-------------|
+| `diff` | Code snippet / diff to review |
+| `file_name` | File being reviewed |
+| `language` | Programming language |
+| `task_id` | Unique identifier |
+| `difficulty` | easy / medium / hard |
+| `step_count` | Current step |
+| `max_steps` | Max allowed steps |
+
+---
+
+### Action Space
+
+The agent can perform:
+
+| Action | Description |
+|--------|-------------|
+| `submit_review` | Submit a review with explanation + fix |
+| `skip_task` | Skip current task (penalty applied) |
+
+Each action includes:
+
+- `content` → Generated review text
+- `line_numbers` (optional) → Lines being referenced
+
+---
+
+### State Space
+
+The environment tracks:
+
+- Current task
+- Step count
+- Accumulated reward
+- Whether review was submitted
+- Metadata (difficulty, source, etc.)
+
+---
+
+### Reward Function
+
+Rewards are computed using **difficulty-specific graders**:
+
+| Difficulty | Evaluation Focus |
+|------------|------------------|
+| Easy | Syntax error detection |
+| Medium | Logical bug reasoning |
+| Hard | Performance optimization |
+
+Evaluation considers:
+
+- Bug detection
+- Explanation quality
+- Fix correctness
+- Complexity analysis
 
 ---
 
@@ -64,53 +119,40 @@ Grading System
 
 ---
 
-## ⚙️ Technical Breakdown
+## ⚙️ Technical Components
 
 ### 1. OpenEnv Environment
 
-Implements a reinforcement learning loop:
-
-**Observation:**
-- Code diff
-- File metadata
-- Task difficulty
-
-**Actions:**
-- `submit_review`
-- `skip_task`
-
-**Tracks:**
-- Step count
-- Rewards
-- Task state
-
-**Reward based on:**
-- Bug detection
-- Reasoning quality
-- Fix correctness
+- Handles task sampling
+- Manages state transitions
+- Computes rewards
+- Ensures RL compatibility
 
 ---
 
-### 2. Task Design
+### 2. Task Dataset
 
-Tasks are divided into 3 difficulty levels:
+Stored as JSON files:
 
-| Level | Type | Example |
-|-------|------|---------|
-| Easy | Syntax errors | `=` instead of `==` |
-| Medium | Logical bugs | Wrong initialization |
-| Hard | Algorithmic inefficiency | O(n²) → O(n) |
+- `easy.json`
+- `medium.json`
+- `hard.json`
 
-Each task is stored in JSON datasets and dynamically loaded.
+Each task includes:
+
+- Code diff
+- Description
+- Expected concepts
 
 ---
 
 ### 3. Grading System
 
-Each difficulty uses a custom evaluator:
+Custom evaluators per difficulty:
 
-- Keyword + pattern-based scoring
-- AST validation (for code correctness)
+- Keyword matching
+- Pattern recognition
+- AST validation (for correctness)
 - Complexity-aware scoring
 
 Ensures:
@@ -125,16 +167,13 @@ Ensures:
 
 - Uses OpenAI-compatible APIs (OpenRouter / HuggingFace)
 
-- Structured prompting:
+- Generates structured reviews:
   - Bug detection
   - Explanation
-  - Fix suggestion
-  - Complexity analysis
+  - Fix
+  - Complexity
 
-- Output is:
-  - Parsed
-  - Normalized
-  - Converted into grader-compatible format
+- Output is normalized for grading
 
 ---
 
@@ -155,15 +194,17 @@ Ensures:
 
 ### ⚡ Run All Tasks (Benchmark Mode)
 
-- Executes the agent across **all tasks in JSON datasets**
+- Runs agent on all dataset tasks
 - Automatically:
-  - Runs inference
-  - Submits reviews
+  - Performs inference
+  - Submits actions
   - Evaluates rewards
-- Outputs:
-  - Score per task
-  - Average score
-  - Performance across difficulty levels
+
+Outputs:
+
+- Per-task score
+- Average score
+- Difficulty-wise performance
 
 ➡️ Acts as a **full evaluation pipeline for the agent**
 
@@ -175,7 +216,7 @@ Users can:
 
 - Paste any code snippet
 - Provide:
-  - Description (what code should do)
+  - Description
   - File name
   - Language
 
@@ -186,12 +227,12 @@ Users can:
 - TypeScript
 - C++
 
-The system will:
+System outputs:
 
-- Analyze the code
-- Detect bugs / inefficiencies
-- Suggest fixes
-- Provide complexity analysis
+- Bug detection
+- Fix suggestions
+- Optimization ideas
+- Complexity analysis
 
 ➡️ Works like a **real-world AI code reviewer**
 
@@ -213,14 +254,45 @@ The system will:
 
 ---
 
+## 🔧 Setup (Optional - Local)
+
+Clone the repository:
+
+```bash
+https://github.com/DE9856/code-review-env
+cd your-repo
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Create `.env` file:
+
+```env
+OPENAI_API_KEY=your_api_key
+API_BASE_URL=https://router.huggingface.co/hf-inference/models
+MODEL_NAME=mistralai/Mistral-7B-Instruct-v0.3
+```
+
+Run server:
+
+```bash
+uvicorn app:app --reload
+```
+
+---
+
 ## 🚀 Key Innovations
 
 - OpenEnv-based code review environment
-- Full RL loop for LLM evaluation
+- RL loop applied to LLM evaluation
 - Structured reward system for subjective tasks
+- Dataset benchmarking + live inference
+- Supports both automated evaluation and custom inputs
 - Converts LLMs into trainable agents
-- Built-in benchmarking + real-time UI
-- Supports both **dataset evaluation** and **custom inputs**
 
 ---
 
@@ -258,10 +330,10 @@ def is_even(n): return n % 2 = 0
 ---
 
 ## 👨‍💻 Team
-```
-Meta AI Hackathon Team
-Filter Kaapi Force:
-        ->Deepesh Kumar Kotta
-        ->Balaji Keerthi
-        ->Abdul Hakeem K
-```
+
+**Meta AI Hackathon Team**  
+*Filter Kaapi Force:*
+
+- Deepesh Kumar Kotta
+- Balaji Keerthi
+- Abdul Hakeem K
