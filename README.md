@@ -40,11 +40,11 @@ This transforms code review into a **learning problem**.
 
 We combine:
 
-- LLMs (for reasoning and generation)
-- OpenEnv (for agent-environment interaction)
-- Custom reward functions (for evaluation)
+- LLMs (reasoning + generation)
+- OpenEnv (agent-environment interaction)
+- Custom reward functions (evaluation)
 
-This enables **trainable code-review agents**.
+➡️ Enabling **trainable code-review agents**
 
 ---
 
@@ -61,6 +61,7 @@ OpenEnv Environment
         ↓
 Grading System
 ```
+
 ---
 
 ## ⚙️ Technical Breakdown
@@ -94,14 +95,13 @@ Implements a reinforcement learning loop:
 
 Tasks are divided into 3 difficulty levels:
 
-**Easy** — Syntax errors
-Example: "=" instead of "=="
+| Level | Type | Example |
+|-------|------|---------|
+| Easy | Syntax errors | `=` instead of `==` |
+| Medium | Logical bugs | Wrong initialization |
+| Hard | Algorithmic inefficiency | O(n²) → O(n) |
 
-**Medium** — Logical bugs
-Example: wrong initialization or edge cases
-
-**Hard** — Algorithmic inefficiency
-Example: O(n²) → O(n) optimization
+Each task is stored in JSON datasets and dynamically loaded.
 
 ---
 
@@ -140,39 +140,76 @@ Ensures:
 
 ### 5. API Layer (FastAPI)
 
-Endpoints:
-
-- `/reset` → Initialize environment
-- `/step` → Submit review & get reward
-- `/state` → Get environment state
-- `/tasks` → List all tasks
-- `/infer` → Run LLM review
-- `/run_all_tasks` → Benchmark all tasks
+| Endpoint | Function |
+|----------|----------|
+| `/reset` | Initialize environment |
+| `/step` | Submit review & get reward |
+| `/state` | Get environment state |
+| `/tasks` | List all tasks |
+| `/infer` | Run LLM review |
+| `/run_all_tasks` | Benchmark all tasks |
 
 ---
 
-### 6. Frontend (Interactive UI)
+## 🔥 Key Features (Demo Highlights)
 
-- Run benchmark across all tasks
+### ⚡ Run All Tasks (Benchmark Mode)
 
-- View:
-  - Scores
-  - Complexity improvements
-  - Task difficulty
+- Executes the agent across **all tasks in JSON datasets**
+- Automatically:
+  - Runs inference
+  - Submits reviews
+  - Evaluates rewards
+- Outputs:
+  - Score per task
+  - Average score
+  - Performance across difficulty levels
 
-- Custom mode:
-  - Paste code
-  - Get AI review instantly
+➡️ Acts as a **full evaluation pipeline for the agent**
+
+---
+
+### ✨ Custom Code Review (Interactive Mode)
+
+Users can:
+
+- Paste any code snippet
+- Provide:
+  - Description (what code should do)
+  - File name
+  - Language
+
+**Supported languages:**
+- Python
+- Java
+- JavaScript
+- TypeScript
+- C++
+
+The system will:
+
+- Analyze the code
+- Detect bugs / inefficiencies
+- Suggest fixes
+- Provide complexity analysis
+
+➡️ Works like a **real-world AI code reviewer**
 
 ---
 
 ## 📊 Evaluation Pipeline
 
+```
 1. Load task
+        ↓
 2. Generate review using LLM
+        ↓
 3. Format output
+        ↓
 4. Evaluate using grader
+        ↓
 5. Return reward
+```
 
 ---
 
@@ -182,17 +219,19 @@ Endpoints:
 - Full RL loop for LLM evaluation
 - Structured reward system for subjective tasks
 - Converts LLMs into trainable agents
-- Supports automated benchmarking
+- Built-in benchmarking + real-time UI
+- Supports both **dataset evaluation** and **custom inputs**
 
 ---
 
 ## 🧪 Example Task
 
-Input: def is_even(n): return n % 2 = 0
+**Input:**
+```python
+def is_even(n): return n % 2 = 0
+```
 
-
-Agent must:
-
+**Agent must:**
 - Detect syntax error
 - Explain issue
 - Suggest fix
@@ -205,24 +244,23 @@ Agent must:
 - Multi-step reasoning agents
 - Learned reward models
 - Code execution validation
-- Multi-language support
-- Fine-tuned reviewer models
+- Multi-language expansion
+- Fine-tuned reviewer agents
 
 ---
 
 ## 🏆 Hackathon Vision
 
-Move from:
-LLMs that generate answers
+**Move from:** LLMs that generate answers
 
-To:
-Agents that learn, evaluate, and improve
+**To:** Agents that learn, evaluate, and improve
 
 ---
 
 ## 👨‍💻 Team
+
 Meta AI Hackathon Team
 Filter Kaapi Force:
-  -> Deepesh Kumar Kotta
-  -> Abdul Hakeem K
-  -> Balaji Keerthi
+        -> Deepesh Kumar Kotta
+        -> Balaji Keerthi
+        -> Abdul Hakeem K
