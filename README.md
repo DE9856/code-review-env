@@ -275,6 +275,7 @@ Create `.env` file:
 OPENAI_API_KEY=your_api_key
 API_BASE_URL=https://router.huggingface.co/hf-inference/models
 MODEL_NAME=mistralai/Mistral-7B-Instruct-v0.3
+HF_TOKEN = your_hugging_face_token
 ```
 
 Run server:
