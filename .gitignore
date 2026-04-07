@@ -31,6 +31,3 @@ Thumbs.db
 build/
 dist/
 *.egg-info/
-
-# YAML sensitive configs
-openenv.yaml
