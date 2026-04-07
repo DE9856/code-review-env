@@ -261,6 +261,6 @@ def is_even(n): return n % 2 = 0
 
 Meta AI Hackathon Team
 Filter Kaapi Force:
-        -> Deepesh Kumar Kotta
-        -> Balaji Keerthi
-        -> Abdul Hakeem K
+Deepesh Kumar Kotta
+Balaji Keerthi
+Abdul Hakeem K
