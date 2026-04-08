@@ -35,4 +35,4 @@ def grade_hard(output):
     if contains_any(output, ["list", "in operator", "contains"]) and contains_any(output, ["o(n^2)", "quadratic"]):
         score += 0.1
     
-    return max(0.0, min(score, 1.0))
+    return max(0.01, min(score, 0.99))

@@ -25,4 +25,4 @@ def grade_medium(output):
     # Penalty
     if "works fine" in output:
         score -= 0.5
-    return max(0.0, min(score, 1.0))
+    return max(0.01, min(score, 0.99))

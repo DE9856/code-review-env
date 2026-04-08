@@ -30,4 +30,4 @@ def grade_easy(output):
     # Penalty
     if "looks fine" in output:
         score -= 0.5
-    return max(0.0, min(score, 1.0))
+    return max(0.01, min(score, 0.99))
