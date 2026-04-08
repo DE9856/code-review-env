@@ -131,3 +131,76 @@ def run_inference(diff, file_name, language, description, difficulty="easy"):
         "formatted_submission": submission,
         "complexity": complexity
     }
+
+# ---- add these imports at the top of inference.py ----
+import os
+from typing import List, Optional
+
+# ---- add these logging helpers ----
+BENCHMARK = os.getenv("BENCHMARK", "code-review")
+
+def log_start(task: str) -> None:
+    print(f"[START] task={task} env={BENCHMARK} model={MODEL_NAME}", flush=True)
+
+def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str]) -> None:
+    error_val = error if error else "null"
+    action_single = action.replace("\n", " ").replace("\r", "")
+    print(f"[STEP] step={step} action={action_single} reward={reward:.2f} done={str(done).lower()} error={error_val}", flush=True)
+
+def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> None:
+    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+    print(f"[END] success={str(success).lower()} steps={steps} score={score:.3f} rewards={rewards_str}", flush=True)
+
+
+# ---- add this at the bottom of inference.py ----
+if __name__ == "__main__":
+    from environment import CodeReviewEnvironment
+    from models import CodeReviewAction, ActionType
+
+    TASK_ID = os.getenv("TASK_ID", None)
+
+    env = CodeReviewEnvironment(max_steps=10)
+    tasks = env.get_task_list()
+
+    if not tasks:
+        log_start(task="none")
+        log_step(step=1, action="no_tasks", reward=0.0, done=True, error="No tasks found")
+        log_end(success=False, steps=1, score=0.0, rewards=[0.0])
+        exit(1)
+
+    # Run a single task (or all tasks)
+    target_tasks = [t for t in tasks if t["id"] == TASK_ID] if TASK_ID else tasks
+
+    all_rewards = []
+
+    for task_info in target_tasks:
+        task_id     = task_info["id"]
+        description = task_info.get("description", "")
+        difficulty  = task_info.get("difficulty", "easy")
+
+        log_start(task=task_id)
+        try:
+            obs = env.reset(task_id=task_id)
+
+            result = run_inference(
+                diff=obs.diff,
+                file_name=obs.file_name,
+                language=obs.language,
+                description=description,
+                difficulty=difficulty,
+            )
+
+            action = CodeReviewAction(
+                action_type=ActionType.SUBMIT_REVIEW,
+                content=result["formatted_submission"]
+            )
+            obs, reward, done, info = env.step(action)
+
+            all_rewards.append(reward)
+            log_step(step=1, action=result["formatted_submission"], reward=reward, done=done, error=None)
+            log_end(success=reward > 0.0, steps=1, score=reward, rewards=[reward])
+
+        except Exception as e:
+            log_step(step=1, action="run_inference", reward=0.0, done=True, error=str(e))
+            log_end(success=False, steps=1, score=0.0, rewards=[0.0])
+            all_rewards.append(0.0)
