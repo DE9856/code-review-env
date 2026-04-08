@@ -10,8 +10,7 @@ API_KEY = os.getenv("API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen3-Coder-480B-A35B-Instruct")
 TEMPERATURE = 0.7
 MAX_TOKENS = 500
-if not API_BASE_URL or not API_KEY:
-    raise Exception("Missing API_BASE_URL or API_KEY")
+
 
 SYSTEM_PROMPT = """You are a code reviewer AI. For each task:
 1. Read the code diff carefully
@@ -101,22 +100,24 @@ def run_inference(diff, file_name, language, description, difficulty="easy"):
     This is the function your FastAPI will call
     """
 
-    if not API_KEY:
-        raise Exception("API_KEY not set")
+    if not API_BASE_URL or not API_KEY:
+        raise Exception("API_KEY or API_BASE_URL missing at runtime")
 
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
-
     prompt = build_review_prompt(diff, file_name, language, description)
 
-    completion = client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt}
-        ],
-        temperature=TEMPERATURE,
-        max_tokens=MAX_TOKENS,
-    )
+    try:
+        completion = client.chat.completions.create(
+            model=MODEL_NAME,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=TEMPERATURE,
+            max_tokens=MAX_TOKENS,
+        )
+    except Exception as e:
+        raise Exception(f"LLM call failed: {str(e)}")
 
     review = completion.choices[0].message.content or ""
 
@@ -134,8 +135,7 @@ def run_inference(diff, file_name, language, description, difficulty="easy"):
         "complexity": complexity
     }
 
-# ---- add these imports at the top of inference.py ----
-import os
+
 from typing import List, Optional
 
 # ---- add these logging helpers ----
