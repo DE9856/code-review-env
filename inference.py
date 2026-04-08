@@ -5,11 +5,13 @@ import os
 from openai import OpenAI
 
 # ENV CONFIG
-API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/hf-inference/models")
-API_KEY = os.getenv("OPENAI_API_KEY", "")
+API_BASE_URL = os.getenv("API_BASE_URL")
+API_KEY = os.getenv("API_KEY")
 MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen3-Coder-480B-A35B-Instruct")
 TEMPERATURE = 0.7
 MAX_TOKENS = 500
+if not API_BASE_URL or not API_KEY:
+    raise Exception("Missing API_BASE_URL or API_KEY")
 
 SYSTEM_PROMPT = """You are a code reviewer AI. For each task:
 1. Read the code diff carefully
@@ -100,7 +102,7 @@ def run_inference(diff, file_name, language, description, difficulty="easy"):
     """
 
     if not API_KEY:
-        raise Exception("OPENAI_API_KEY not set")
+        raise Exception("API_KEY not set")
 
     client = OpenAI(base_url=API_BASE_URL, api_key=API_KEY)
 
