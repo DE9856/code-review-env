@@ -34,7 +34,7 @@ env = CodeReviewEnvironment(max_steps=10)
 
 
 # -------------------------
-# Structured Logging Helpers  (matches required stdout format)
+# Structured Logging Helpers
 # -------------------------
 
 def log_start(task: str) -> None:
@@ -44,7 +44,6 @@ def log_start(task: str) -> None:
 def log_step(step: int, action: str, reward: float, done: bool, error: Optional[str]) -> None:
     error_val = error if error else "null"
     done_val  = str(done).lower()
-    # Collapse action to single line to comply with "no newlines within a line" rule
     action_single = action.replace("\n", " ").replace("\r", "")
     print(
         f"[STEP] step={step} action={action_single} reward={reward:.2f} done={done_val} error={error_val}",
@@ -60,18 +59,10 @@ def log_end(success: bool, steps: int, score: float, rewards: List[float]) -> No
     )
 
 
-# -------------------------
-# Health Check
-# -------------------------
-
 @app.get("/")
 async def serve_frontend():
     return FileResponse("index.html")
 
-
-# -------------------------
-# Environment APIs
-# -------------------------
 
 @app.post("/reset")
 async def reset(task_id: str = None) -> CodeReviewObservation:
@@ -119,7 +110,6 @@ async def get_tasks() -> list:
 
 @app.post("/infer")
 async def infer(data: Dict[str, Any]):
-    """Run code review inference using LLM"""
     task_id     = data.get("task_id", "unknown")
     diff        = data.get("diff")
     file_name   = data.get("file_name")
@@ -141,9 +131,18 @@ async def infer(data: Dict[str, Any]):
             description=description,
             difficulty=difficulty
         )
+
+        action = CodeReviewAction(
+            action_type=ActionType.SUBMIT_REVIEW,
+            content=result["formatted_submission"]
+        )
+
+        obs, reward, done, info = env.step(action)
+
+        # ONLY FIX
+        reward = max(0.01, min(0.99, reward))
+
         steps_taken = 1
-        reward = 0.0
-        done   = True
         rewards.append(reward)
 
         log_step(step=1, action=result["formatted_submission"], reward=reward, done=done, error=None)
@@ -162,7 +161,6 @@ async def infer(data: Dict[str, Any]):
 
 @app.post("/auto_infer")
 async def auto_infer(task_id: str):
-    """Automatically run inference on a task from your dataset"""
     rewards: List[float] = []
     steps_taken = 0
     success = False
@@ -188,9 +186,18 @@ async def auto_infer(task_id: str):
             description=description,
             difficulty=difficulty
         )
+
+        action = CodeReviewAction(
+            action_type=ActionType.SUBMIT_REVIEW,
+            content=result["formatted_submission"]
+        )
+
+        obs, reward, done, info = env.step(action)
+
+        # ONLY FIX
+        reward = max(0.01, min(0.99, reward))
+
         steps_taken = 1
-        reward = 0.0
-        done   = True
         rewards.append(reward)
 
         log_step(step=1, action=result["formatted_submission"], reward=reward, done=done, error=None)
@@ -219,7 +226,6 @@ async def auto_infer(task_id: str):
 
 @app.get("/run_all_tasks")
 async def run_all_tasks():
-    """Run inference on ALL tasks"""
     try:
         tasks = env.get_task_list()
         if not tasks:
@@ -257,21 +263,24 @@ async def run_all_tasks():
 
                 obs, reward, done, info = env.step(action)
 
+                # ONLY FIX
+                reward = max(0.01, min(0.99, reward))
+
                 rewards.append(reward)
                 steps_taken = 1
                 all_rewards.append(reward)
 
                 log_step(step=1, action=result["formatted_submission"], reward=reward, done=done, error=None)
 
-                score   = reward  # already in [0, 1] from environment
+                score   = reward
                 success = reward > 0.0
 
                 all_results.append({
-                    "task_id":    task_id,
+                    "task_id": task_id,
                     "difficulty": difficulty,
-                    "reward":     reward,
-                    "done":       done,
-                    "review":     result["review"],
+                    "reward": reward,
+                    "done": done,
+                    "review": result["review"],
                     "complexity": result["complexity"]
                 })
 
@@ -288,9 +297,9 @@ async def run_all_tasks():
 
         avg_score = sum(all_rewards) / len(all_rewards) if all_rewards else 0.0
         return {
-            "total_tasks":   len(all_results),
+            "total_tasks": len(all_results),
             "average_score": avg_score,
-            "results":       all_results
+            "results": all_results
         }
 
     except Exception as e:
